@@ -4,9 +4,9 @@
 **Covers:** CiliaQ Preparator v0.2.0 · CiliaQ Editor v0.0.4 · CiliaQ v0.2.1
 **Latest version of this kit:** https://github.com/hansenjn/CiliaQ-LLM-Kit
 
-> **For people:** give this file to your AI assistant, together with the file for the tool you need
-> help with (see §1). You never need to upload your images, but it can be helpful.
-> More in `README.md`.
+**For people:** give this file to your AI assistant, together with the file for the tool you need
+help with (see §1). You never need to upload your images, but it can be helpful.
+More in `README.md`.
 
 > **IMPORTANT — please read before use.** This kit is new and under active development, and it
 > may change substantially in the coming weeks. Please report errors or problems (see `README.md`).
