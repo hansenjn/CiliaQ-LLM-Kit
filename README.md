@@ -120,7 +120,7 @@ for automated quantification of ciliary morphology and fluorescence in 2D, 3D, a
 
 If this kit helped you choose settings, please also name it in your methods, with its version and
 the assistant you used, e.g.: "Settings were chosen with the help of the CiliaQ LLM Kit v0.0.1
-(https://github.com/hansenjn/CiliaQ-LLM-Kit) and <assistant and version>." The kit version is at
+(https://github.com/hansenjn/CiliaQ-LLM-Kit) and `<assistant and version>`." The kit version is at
 the top of `00_START_HERE.md`. GitHub's "Cite this repository" button gives the CiliaQ reference.
 
 Once this kit and CiliaQ 0.2.x and CiliaQ Preparator 0.2.x versions with new functions have been fully
