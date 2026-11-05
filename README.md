@@ -1,4 +1,9 @@
-# CiliaQ LLM Kit
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/llm-kit-logo-dark.svg">
+    <img src="assets/llm-kit-logo.svg" alt="CiliaQ LLM Kit" width="480">
+  </picture>
+</p>
 
 Documents that let an AI assistant give you **specific, testable help with CiliaQ** — choosing
 segmentation settings for your images, correcting masks, choosing CiliaQ settings, and making sense
