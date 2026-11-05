@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+message: >-
+  If you publish results obtained with CiliaQ, please cite the CiliaQ paper below.
+  If this kit helped you choose settings, please also name the kit and its version in your methods.
+title: CiliaQ LLM Kit
+version: 0.0.1
+abstract: >-
+  Documents that let AI assistants and agents give specific help with the ImageJ
+  plugins CiliaQ Preparator, CiliaQ Editor, and CiliaQ.
+authors:
+  - family-names: Hansen
+    given-names: Jan Niklas
+    orcid: "https://orcid.org/0000-0002-0489-7535"
+repository-code: "https://github.com/hansenjn/CiliaQ-LLM-Kit"
+url: "https://github.com/hansenjn/CiliaQ-LLM-Kit"
+license: CC-BY-4.0
+keywords:
+  - cilia
+  - CiliaQ
+  - ImageJ
+  - Fiji
+  - segmentation
+  - LLM
+preferred-citation:
+  type: article
+  title: >-
+    CiliaQ: a simple, open-source software for automated quantification of ciliary morphology
+    and fluorescence in 2D, 3D, and 4D images
+  authors:
+    - family-names: Hansen
+      given-names: Jan Niklas
+      orcid: "https://orcid.org/0000-0002-0489-7535"
+    - family-names: Rassmann
+      given-names: Sebastian
+    - family-names: Stüven
+      given-names: Birthe
+    - family-names: Jurisch-Yaksi
+      given-names: Nathalie
+      orcid: "https://orcid.org/0000-0002-8767-6120"
+    - family-names: Wachten
+      given-names: Dagmar
+      orcid: "https://orcid.org/0000-0003-4800-6332"
+  journal: The European Physical Journal E
+  volume: 44
+  issue: 2
+  start: 18
+  year: 2021
+  doi: 10.1140/epje/s10189-021-00031-y
