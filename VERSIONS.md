@@ -97,9 +97,10 @@ All entries `[release notes]` unless tagged otherwise.
 
 All entries `[release notes]` unless tagged otherwise.
 
-**Known issue in v0.2.1:** without basal-body segmentation, the `_CQ.txt` header shows
-`of total #: 0`. Count the result rows instead (`ciliaq/CILIAQ_v0.2.1.md` §4.2). `[code]`
-`[measured]`
+**Known issues in v0.2.1:** 
+- without basal-body segmentation, the `_CQ.txt` header shows `of total #: 0`. Count the result rows instead (`ciliaq/CILIAQ_v0.2.1.md` §4.2). `[code]` `[measured]` `[developer]`
+- `minimum-basal-body-size` has no effect, so basal bodies smaller than `minimum-cilium-size` are dropped without a warning (`ciliaq/CILIAQ_v0.2.1.md` §2.5). `[code]` `[measured]` `[developer]`
+- in z-stacks, the intensities around the basal body are measured at the wrong height; do not use those columns from z-stacks (`ciliaq/CILIAQ_v0.2.1.md` §5.3). `[code]` `[measured]` `[developer]`
 
 ---
 

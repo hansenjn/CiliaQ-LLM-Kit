@@ -141,6 +141,13 @@ cilium in 2D. `[code]`
 Requires a segmented basal-body channel from the Preparator. Not available for time-lapse images:
 the analysis is cancelled. `[code]` `[wiki]`
 
+**Known issue in v0.2.1, will be fixed in v0.2.2:**
+`minimum-basal-body-size` has no effect. Basal-body objects are filtered by `minimum-cilium-size`
+instead, so basal bodies smaller than the minimum cilium size are dropped without a warning
+(a channel of 1–2-voxel spots gives zero basal bodies and only the log line `No BBs found in image`).
+To keep small basal bodies in v0.2.1, lower `minimum-cilium-size` to their size; this also keeps cilium
+objects down to that size, so judge or filter small cilia in the results. `[code]` `[measured]`
+
 ---
 
 ## 3. Choosing the settings
@@ -321,6 +328,14 @@ assistant must get right: `[wiki]`
 Written only with a segmented basal-body channel in static images. Empty fields mean "no basal
 body assigned", not zero. The 1 µm and 1–2 µm intensity shells are fixed radii in the calibration
 unit. `[wiki]`
+
+**Known issue in v0.2.1, will be fixed in v0.2.2:** in z-stacks, the intensities around the basal
+body (`basalbody center A/B intensity`, `A/B intensity within 1 … to basal body`, `A/B intensity
+1-2 … to basal body`) are measured at the wrong height. The basal body's z is converted with the xy
+pixel size instead of the voxel depth, so the measurement sits near the first planes (on a test
+stack, the centre intensity read 0 instead of 30000). Do not use these columns from z-stacks in
+v0.2.1. 2D images, and stacks whose voxel depth equals the pixel size, are not affected, nor are
+the other basal-body columns. `[code]` `[measured]` `[developer]`
 
 ### 5.4 Combining results
 
