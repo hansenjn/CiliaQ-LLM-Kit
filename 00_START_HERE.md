@@ -1,8 +1,8 @@
 # CiliaQ LLM Kit — START HERE
 
-**Kit version:** 0.0.1 · **Last updated:** November 2026 · **Maintainer:** Jan N. Hansen
-**Covers:** CiliaQ Preparator v0.2.0 · CiliaQ Editor v0.0.4 · CiliaQ v0.2.1
-**Latest version of this kit:** https://github.com/hansenjn/CiliaQ-LLM-Kit
+**Kit version:** 0.0.2 · **Last updated:** November 2026 · **Maintainer:** Jan N. Hansen
+**Covers:** CiliaQ Preparator v0.2.0 · CiliaQ Editor v0.0.4 · CiliaQ v0.2.1 · CiliaQ v0.1.7 (time-lapse)
+**Latest version of this kit:** https://github.com/hansenjn/CiliaQ-LLM-Kit/releases/latest
 
 **For people:** give this file to your AI assistant, together with the file for the tool you need
 help with (see §1). You never need to upload your images, but it can be helpful.
@@ -34,7 +34,8 @@ rules for the entire conversation.
    that exist only in unreleased code (the GitHub `master` branch can contain features that no
    release has).
 2. **Establish the versions first** (§2). If the kit has no file for the user's version, say so.
-   Give only advice that this file marks as version-independent, and label it as such.
+   Give only advice that does not depend on the version (such as §4 and §6 of this file),
+   and label it as such.
 3. **Understand the data and the question before proposing anything.** Ask about: microscope type
    (confocal or widefield/epifluorescence), 2D, 3D or time-lapse, pixel size and z step, which
    channel shows cilia, and **what the user wants to measure** (§4). The best settings depend on it.
@@ -85,6 +86,7 @@ rules for the entire conversation.
 | segment cilia, choose preprocessing or a threshold method, fix a bad mask automatically | `preparator/PREPARATOR_v0.2.0.md` and `ciliaq/CILIAQ_v0.2.1.md` |
 | correct a segmentation by hand | `editor/EDITOR_v0.0.4.md` |
 | choose CiliaQ settings, understand or check CiliaQ results | `preparator/PREPARATOR_v0.2.0.md` and `ciliaq/CILIAQ_v0.2.1.md` |
+| analyse time-lapse images with CiliaQ | `preparator/PREPARATOR_v0.2.0.md` and `ciliaq/CILIAQ_v0.1.7.md` |
 | fix a problem seen in the results without knowing which tool causes it | §5 of this file, then the tool file it names |
 | know which versions to use, whether results can be combined, or reproduce an old analysis | `VERSIONS.md` |
 | run the tools automatically (agents) | `agents/AGENT_GUIDE.md` |
@@ -111,13 +113,21 @@ advised if it is promising for improving results and suitable for the user's que
 
 | tool | version this kit covers | status | what to know |
 |---|---|---|---|
-| CiliaQ Preparator | v0.2.0 (Aug 2026) | stable | With the same settings and ImageJ version, output is byte-identical to v0.1.2. v0.2.0 adds pre-blur, macro/headless use and setup checks. `[release notes]` |
+| CiliaQ Preparator | v0.2.0 (Aug 2026) | stable | Under the conditions of `VERSIONS.md` §2 rule 5, output is byte-identical to v0.1.2. Known issues (e.g. Canny 3D `Custom Value` thresholds are not applied): `VERSIONS.md` §3. v0.2.0 adds pre-blur, macro/headless use and setup checks. `[release notes]` |
 | CiliaQ Editor | v0.0.4 (Oct 2025) | stable | Interactive only. Edits can be combined with data edited in earlier versions only if the option to add pixels with intensity 0 is **off**. `[release notes]` |
-| CiliaQ | v0.2.1 (Oct 2024) | use for **static 2D and 3D images** | Not for time-lapse images. For time-lapse, use v0.1.7. `[developer]` |
+| CiliaQ | v0.2.1 (Oct 2024) | use for **static 2D and 3D images** | Labelled beta; the developer considers it suitable for static images. Not for time-lapse images; for those, use v0.1.7. `[release notes]` `[developer]` |
+| CiliaQ | v0.1.7 (May 2023) | use for **time-lapse images** | Dialog only (no macro or headless use). `ciliaq/CILIAQ_v0.1.7.md`. `[developer]` `[code]` |
 
 **Results that must not be combined:** cilium length and other skeleton-based results from CiliaQ
 v0.1.7 or later must not be pooled with results from earlier versions, because v0.1.7 changed how
-the skeleton is computed. `[release notes]` Full history: `VERSIONS.md`.
+the skeleton is computed. `[release notes]` Static (v0.2.1) and time-lapse (v0.1.7) results come
+from different CiliaQ versions, so do not pool or compare them directly.
+All rules for combining results: `VERSIONS.md` §2.
+
+**Uncalibrated images give wrong skeleton results in every CiliaQ version so far** (up to v0.2.1; GitHub #15): when
+`Image ▸ Properties…` shows the unit "pixel" with pixel size and voxel depth 1, cilium lengths come out 3× too long
+and orientation, bending index and profiles are wrong. Always calibrate the image with its real pixel size and z step
+before CiliaQ (`VERSIONS.md` §2 rule 8). `[code]` `[measured]`
 
 ---
 
@@ -157,8 +167,9 @@ Facts that connect the steps. Each tool file explains them in detail.
 - **CiliaQ settings can compensate for some segmentation problems** — small gaps (connectivity
   option), debris (minimum size), rough masks (blur before skeletonization). Before tuning the
   Preparator further, check §5: the fix may belong in CiliaQ.
-- **What can be automated:** the Preparator v0.2.0 by macro or headless; CiliaQ v0.2.x by macro or
-  headless `[release notes]`; the Editor not at all — it is only for direct user interaction.
+- **What can be automated:** the Preparator v0.2.0 by macro or headless; CiliaQ v0.2.1 (static images) by macro or
+  headless `[release notes]`; CiliaQ v0.1.7 (time-lapse) only in the dialog `[code]`; the Editor not at all —
+  it is only for direct user interaction.
 
 ---
 
@@ -184,7 +195,8 @@ Ask this early. The same mask can be fine for one question and wrong for another
 | one cilium reported as several objects | gaps in the staining or in the mask | Preparator (blur, hysteresis); CiliaQ connectivity option; Editor `[wiki]` |
 | neighbouring cilia reported as one long cilium | the mask bridges them | Preparator (less blur; Canny 3D fuses more readily); Editor to cut them apart `[wiki]` |
 | many skeleton branches | rough mask surface from noise | Preparator (small blur); CiliaQ blur before skeletonization. Branches are harmless if the main skeleton follows the cilium `[wiki]` |
-| cilia with no length (0 skeletons) | the object is roughly spherical: a cross-section, a stub, or a cilium cut by the stack edge | usually not an error — see the CiliaQ file for how to handle them `[wiki]` |
+| cilia with no length (0 skeletons) | the object is roughly spherical: a cross-section, a stub, or a cilium cut by the stack edge | usually not an error — see `ciliaq/CILIAQ_v0.2.1.md` §4.3 for how to handle them `[wiki]` |
+| cilium lengths about 3× too long; the base mark in `_CQ_SKL.tif` away from the skeleton | the image is not calibrated (unit "pixel", pixel size 1; GitHub #15) | calibrate the image with its real pixel size and z step (`Image ▸ Properties…`) and rerun CiliaQ `[code]` `[measured]` |
 | masks much wider than the cilia, skeletons with kinks (widefield images) | out-of-focus blur included in the mask | Preparator: Subtract Background with a small radius `[wiki]` |
 | many small debris objects | background kept in the mask | CiliaQ minimum size; Preparator background removal; Editor `[wiki]` |
 | most cilia missing | a very bright particle distorting the threshold, an unsuitable method, or weak signal | Preparator; check for aggregates and dirt; sometimes re-imaging, or cropping the image to exclude the bright particle `[wiki]` `[developer]` |

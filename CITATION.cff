@@ -3,7 +3,8 @@ message: >-
   If you publish results obtained with CiliaQ, please cite the CiliaQ paper below.
   If this kit helped you choose settings, please also name the kit and its version in your methods.
 title: CiliaQ LLM Kit
-version: 0.0.1
+version: 0.0.2
+date-released: 2026-11-20
 abstract: >-
   Documents that let AI assistants and agents give specific help with the ImageJ
   plugins CiliaQ Preparator, CiliaQ Editor, and CiliaQ.

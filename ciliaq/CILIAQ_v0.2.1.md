@@ -1,9 +1,9 @@
 # CiliaQ v0.2.1
 
-**Kit version:** 0.0.1 · **Last updated:** November 2026
+**Kit version:** 0.0.2 · **Last updated:** November 2026
 **Verified against:** git tag `v0.2.1` of https://github.com/hansenjn/CiliaQ (`CiliaQMain.java`)
-**Sources:** source code, release notes v0.0.5–v0.2.1, CiliaQ wiki (Step 3 tutorial, Output
-Parameters, Q&As), CiliaQ SOP, CiliaQ paper
+**Sources:** source code, release notes v0.0.5–v0.2.1, GitHub issues, test runs (November 2026), CiliaQ wiki
+(Step 3 tutorial, Output Parameters, Q&As), CiliaQ SOP, CiliaQ paper
 
 Read `00_START_HERE.md` first. Its rules apply here too.
 
@@ -12,7 +12,7 @@ Read `00_START_HERE.md` first. Its rules apply here too.
 ## 0. Instructions to the assistant (CiliaQ-specific)
 
 1. **Static 2D and 3D images only.** v0.2.1 is not for time-lapse images; for those, CiliaQ v0.1.7
-   should be used, which this file does not cover. `[developer]`
+   should be used (`ciliaq/CILIAQ_v0.1.7.md`). `[developer]`
 2. **Expect a beta warning.** When started from the menu, v0.2.1 shows a dialog calling itself a
    beta ("Version v0.2.0") and recommending v0.1.7; press OK, since Cancel stops CiliaQ. Macro runs
    skip it. For static images, the developer considers v0.2.1 suitable. `[code]` `[developer]`
@@ -22,6 +22,9 @@ Read `00_START_HERE.md` first. Its rules apply here too.
    judging a run. They contain no image data.
 5. **Keep skeleton settings and versions constant across a dataset.** Length and other skeleton
    results depend on the blur before skeletonization and on the CiliaQ version (§5.4).
+6. **Calibrate the image first.** An uncalibrated image (unit "pixel", pixel size 1) gives 3× too long lengths
+   and wrong orientation, bending and profiles (§8); set the real pixel size and z step. `[code]` `[measured]`
+7. **Know the issues in §8** before interpreting basal-body results, profiles or the header counts.
 
 ---
 
@@ -40,7 +43,7 @@ Read `00_START_HERE.md` first. Its rules apply here too.
 6. Optionally computes a **skeleton** for each object (after upscaling and a Gaussian blur) and from
    it the length, orientation, bending, intensity profiles and curvature.
 7. Optionally uses a **basal-body channel** to orient cilia, or to detect basal bodies and match
-   them to cilia (3D static images only).
+   them to cilia (static 2D and 3D images; not for time-lapse).
 
 ---
 
@@ -127,12 +130,13 @@ cilium in 2D. `[code]`
 - `showgui` shows the progress window during a macro run.
 - **Recording** (`Plugins ▸ Macros ▸ Record…`) while using the dialogs produces a replayable
   `run("CiliaQ v0.2.1", "…")` line — the easiest way to hand a working setting to the assistant.
+  The recorder can write the line twice; use one of them. `[code]`
 
 ### 2.5 Basal-body dialog (only with "segmented")
 
 | dialog field | macro key | default |
 |---|---|---|
-| `minimum basal body object size [voxel]:` | `minimum-basal-body-size=` | 1 |
+| `minimum basal body object size [voxel]:` | `minimum-basal-body-size=` | 1 (**no effect**, the minimum cilium size applies, §8) |
 | `Increase range for connecting pixels to form a basal body object` | `increase-range-basal-body` (flag) | on |
 | `Assign` | `assign=[each BB to closest cilium]` (only option) | — |
 | `Max allowed BB-center-to-cilium-skeleton-end distance (calibrated units):` | `max-bb-to-cilium-distance=` | 2.0 |
@@ -141,7 +145,7 @@ cilium in 2D. `[code]`
 Requires a segmented basal-body channel from the Preparator. Not available for time-lapse images:
 the analysis is cancelled. `[code]` `[wiki]`
 
-**Known issue in v0.2.1, will be fixed in v0.2.2:**
+**Known issue in v0.2.1, fix planned for v0.2.2:**
 `minimum-basal-body-size` has no effect. Basal-body objects are filtered by `minimum-cilium-size`
 instead, so basal bodies smaller than the minimum cilium size are dropped without a warning
 (a channel of 1–2-voxel spots gives zero basal bodies and only the log line `No BBs found in image`).
@@ -156,7 +160,9 @@ objects down to that size, so judge or filter small cilia in the results. `[code
 
 Lengths, volumes and distances are in the image's calibration. Check `Image ▸ Properties…` on the
 input: if the unit is "pixel", either fix the calibration or tick `manually calibrate image` and
-enter pixel size and z step. A wrong voxel depth silently distorts every 3D measurement. `[wiki]`
+enter pixel size and z step. A wrong voxel depth silently distorts every 3D measurement. `[wiki]` **An uncalibrated
+image also gives wrong skeleton results (§8): never run v0.2.1 on one.** Use the real pixel size and z step.
+Any calibration avoids the bug, even 1 µm per pixel. `[code]` `[measured]`
 
 ### 3.2 Channels
 
@@ -166,7 +172,7 @@ enter pixel size and z step. A wrong voxel depth silently distorts every 3D meas
   channels. If a *segmented* channel is given as A or B, use only the "colocalized volume"
   parameters from it. `[wiki]`
 - **Basal stain:** "available" uses the stain to decide which skeleton end is the base (within
-  1 µm of the skeleton ends since v0.2.0); without it, base and tip are assigned arbitrarily, so
+  1 µm of the skeleton ends since v0.2.0; strictly 1 in the image's unit, §8) without it, base and tip are assigned arbitrarily, so
   orientation vectors and profile directions are not meaningful. "Segmented" detects basal bodies
   (§3.6). `[release notes]` `[wiki]`
 
@@ -183,6 +189,10 @@ enter pixel size and z step. A wrong voxel depth silently distorts every 3D meas
   include them depends on whether partly captured cilia would bias the measurement. In 2D, see
   §2.3. `[wiki]` `[code]`
 - Leave **minimum size of intensity regions** at 1 unless channel A or B is segmented. `[wiki]`
+- **The segmentation method shapes the objects.** Canny 3D masks from the Preparator are wider than hysteresis masks
+  (in a measured example 1.7× the volume, mostly in z) and join close cilia more easily; a too-low hysteresis low
+  threshold widens masks and joins neighbours too. Volume and surface follow the mask; length much less. If CiliaQ
+  finds unusually long or fused cilia, fix the segmentation first (see `preparator/PREPARATOR_v0.2.0.md`). `[wiki]`
 
 ### 3.4 Skeleton
 
@@ -190,7 +200,8 @@ enter pixel size and z step. A wrong voxel depth silently distorts every 3D meas
   centreline without side branches or kinks. XY sigma 1–2 is usual; Z usually 0. Larger values
   give fewer branches but slightly shorter lengths. `[wiki]` `[paper]`
 - **Use the same values for the whole dataset.** `[wiki]`
-- The blur can also fill hollow masks, e.g. from Canny 3D at the z borders. `[wiki]`
+- The blur can also fill hollow masks, e.g. from Canny 3D at the first and last plane, where the edges enclose an
+  object without filling it. `[wiki]`
 - It affects only skeleton-based results (length, orientation, bending, profiles, curvature), not
   volume or intensities. `[wiki]`
 - **Reference distance for tangents and curvature:** leave the default unless tangents or
@@ -211,7 +222,9 @@ distance from the basal-body centre to the nearest skeleton point of each cilium
 or to the cilium centre if it has no skeleton. Matches farther apart than the maximum distance are
 rejected. `[code]` `[developer]` The skeleton is then extended to the basal-body centre, which
 improves length for very short cilia; a cilium without a skeleton is connected to its basal body.
-`[release notes]`
+`[release notes]` **In v0.2.1 the basal-body z position is converted with the pixel width, not the voxel depth
+(§8):** in stacks with a z step different from the pixel size, basal-body positions, distances and therefore the
+matching can be wrong. `[code]`
 
 If each cell shows a single basal-body spot — or the segmentation fuses the two dots of mother and
 daughter centriole into one object — the basal-body count can estimate the number of cells and
@@ -219,7 +232,8 @@ thus the ciliation rate (from the header counts, §4.2). If the two centrioles a
 separate objects, the count is roughly twice the number of cells. `[developer]` If this varies
 between basal bodies, the cell count is unreliable — say so. Object sizes might help tell single
 from fused pairs, but CiliaQ does not output basal-body sizes, so this would need a separate
-measurement on the segmented channel. `[guess]`
+measurement on the segmented channel. `[guess]` Basal bodies smaller than the minimum cilium size are not
+counted (§2.5, §8).
 
 - The default `Remove` setting drops **both** cilia without a basal body and basal bodies without
   a cilium. That changes cilium counts; choose deliberately.
@@ -277,6 +291,10 @@ the BB count corresponds to cells. Fraction of ciliated cells: see the wiki Outp
   With segmented basal bodies, the header counts are correct. `[code]` `[measured]`
 - `# excluded:` counts cilia excluded for any reason, including the basal-body `Remove` filter,
   although the header line names only the border option. `[measured]`
+- **Undefined values** (e.g. an average over no voxels, or the 10 % highest voxels of a very small object) are
+  written as a replacement character (`&#xFFFD;`) or `∞`, not left empty. Treat such cells as missing. `[code]`
+- **`Maximum span` is not computed:** the column after `Sphere radius` has no name and no values. `[code]`
+  `[measured]`
 
 **IDs** are assigned in scan order (x, then y, then z) and appear in the result images; excluded
 cilia are labelled in a different colour and have no result rows. `[wiki]` `[code]`
@@ -320,16 +338,18 @@ assistant must get right: `[wiki]`
 - **"Compared to background"** parameters use an automatic background threshold per image: the
   image is divided into 25 cuboids, the brightest 10 % of non-cilium voxels of each are collected,
   and threshold = mean + 1.5 × SD. `[wiki]` `[code]` For channels that may contain no real signal,
-  segment them with a fixed threshold in the Preparator instead (see the Preparator file).
+  segment them with a fixed threshold in the Preparator instead (see `preparator/PREPARATOR_v0.2.0.md`).
   `[developer]`
+- **Profiles normalised to the reconstruction channel** are 0 in v0.2.1 (§8); use the raw profiles in `_CQl.txt`.
 
 ### 5.3 Basal-body parameters
 
 Written only with a segmented basal-body channel in static images. Empty fields mean "no basal
-body assigned", not zero. The 1 µm and 1–2 µm intensity shells are fixed radii in the calibration
-unit. `[wiki]`
+body assigned", not zero. The 1 µm and 1–2 µm intensity shells are fixed radii of 1 and 2 **in the image's
+calibration unit**, whatever it is: in a µm image they are 1 and 2 µm, in a nm image 1 and 2 nm. `[wiki]` `[code]`
+Basal-body positions in z are affected by the issue in §3.6.
 
-**Known issue in v0.2.1, will be fixed in v0.2.2:** in z-stacks, the intensities around the basal
+**Known issue in v0.2.1, fix planned for v0.2.2:** in z-stacks, the intensities around the basal
 body (`basalbody center A/B intensity`, `A/B intensity within 1 … to basal body`, `A/B intensity
 1-2 … to basal body`) are measured at the wrong height. The basal body's z is converted with the xy
 pixel size instead of the voxel depth, so the measurement sits near the first planes (on a test
@@ -342,6 +362,9 @@ the other basal-body columns. `[code]` `[measured]` `[developer]`
 - Same CiliaQ version, same settings, same Preparator setting for everything that is compared.
 - Never pool skeleton-based results from v0.1.7 or later with earlier versions. `[release notes]`
 - Changing the skeleton blur changes lengths slightly; never mix sigmas. `[wiki]`
+- Never pool skeleton results of uncalibrated images (§8) with anything.
+- Basal-stain orientation and profile directions across v0.1.7 and v0.2.x: see `VERSIONS.md` §2 rule 3.
+  All rules for combining results: `VERSIONS.md` §2.
 
 ---
 
@@ -355,6 +378,13 @@ the other basal-body columns. `[code]` `[measured]` `[developer]`
 | no or few cilia in the results | border exclusion, a too-high minimum size, or the wrong reconstruction channel | check `# excluded:` in the header, the exclusion option and the channel mapping in `_CQP.txt` |
 | lengths in pixels or implausible | image not calibrated / wrong voxel depth | check `Image ▸ Properties…`; manual calibration |
 | analysis cancelled with basal-body detection | time-lapse image | not supported; use v0.1.7 without basal-body detection |
+| lengths about 3× too long, base mark away from the skeleton in `_CQ_SKL.tif` | uncalibrated image (§8) | calibrate with the real pixel size and z step, rerun |
+| `of total #: 0` in the header | known issue (§8) | count rows in `_CQs.txt` |
+| fewer basal bodies than expected, or `No BBs found in image` | basal bodies below the minimum cilium size are dropped (§8) | lower the minimum cilium size to the basal-body size; judge small cilia in the results |
+| run stops: "PROBLEM: Multiple time points for basal bodies …" | segmented basal bodies, an image without any (§8) | leave the image out, or use "basal stain present" for it |
+| run stops: "Illegal Capacity: -1" | a minimum size of 0 (§8) | set the minimum sizes to 1 or more |
+| basal-body columns empty, rows shorter than the header | skeleton results off (§8) | turn skeleton results on |
+| odd characters in result cells | undefined values (§4.2) | treat as missing |
 | numbers unreadable in Excel | number format | choose the format matching your spreadsheet locale |
 
 ---
@@ -363,5 +393,63 @@ the other basal-body columns. `[code]` `[measured]` `[developer]`
 
 - Step 3 tutorial (based on older version, v0.1.4 `[developer]`): https://github.com/hansenjn/CiliaQ/wiki/Step-3---CiliaQ---Detecting-and-quantifying-cilia-from-the-segmented-image
 - Output parameters: https://github.com/hansenjn/CiliaQ/wiki/CiliaQ-Output-Parameters
-- Not covered: time-lapse analysis, CiliaQ v0.1.7 and earlier, segmentation
+- Time-lapse analysis and CiliaQ v0.1.7: `ciliaq/CILIAQ_v0.1.7.md`.
+- Not covered: CiliaQ versions before v0.1.7, segmentation
   (`preparator/PREPARATOR_v0.2.0.md`), manual editing (`editor/EDITOR_v0.0.4.md`).
+
+## 8. Known issues in v0.2.1 `[code]`
+
+Found in the source code, the GitHub issues and test runs (November 2026). Fixes are planned for v0.2.2.
+
+- **Uncalibrated images give wrong skeleton results** (GitHub #15): with unit "pixel" and pixel size 1, lengths come
+  out 3× too long, and the first skeleton point lies at three times its true position, so the base mark in
+  `_CQ_SKL.tif` is away from the skeleton and orientation, bending index, profiles, arc lengths, the basal-stain
+  orientation and the basal-body matching are wrong. Volume, surface and intensities are not affected. **Always
+  calibrate the image first** with its real pixel size and z step (`Image ▸ Properties…`, or "manually calibrate image" in CiliaQ).
+  The same in every earlier version (lengths 3× in v0.0.5–v0.2.1, the first point in v0.0.6–v0.2.1). `[measured]`
+- **`of total #:` is 0** without basal-body segmentation. Count the result rows. `[measured]`
+- **`minimum-basal-body-size` has no effect**: basal-body objects are filtered by `minimum-cilium-size` instead, so
+  basal bodies smaller than the minimum cilium size are dropped without a warning (§2.5). `[measured]` `[developer]`
+- **Basal-body z is converted with the pixel width** instead of the voxel depth: basal-body positions, distances to
+  cilia and the matching can be wrong in stacks whose z step differs from the pixel size, and the intensities around
+  the basal body are measured at the wrong height; do not use those columns from z-stacks (§5.3). `[measured]`
+  `[developer]`
+- **The basal-body intensity shells** are 1 and 2 in the image's unit, not µm (§5.3); so is the basal-stain
+  orientation radius (1).
+- **Intensity profiles normalised to the reconstruction channel are always 0** (`_CQl.txt` columns "Intensity A/B
+  (normalized to reconstruction channel)"): a comparison with NaN that is never true skips the computation. Use the
+  raw profiles. `[measured]` Also in earlier versions.
+- **`Maximum span` is not computed** (an empty, unnamed column). `[measured]`
+- **Undefined values** are written as a replacement character or `∞` (§4.2).
+- **The recorder** can write the CiliaQ line twice.
+
+Found in a code review of the next version and measured with v0.2.1 (19 November 2026); fixes planned for v0.2.2:
+
+- **Segmented basal bodies and an image without any basal body** (empty basal-body channel): an error "PROBLEM:
+  Multiple time points for basal bodies derived from single-timepoint image!", then the run stops, also for the rest
+  of a batch. Leave such images out, or analyse them with "basal stain present" instead of "segmented". `[measured]`
+- **A minimum cilium size of 0** stops the run ("Illegal Capacity: -1"). Use 1 or more.
+  `[measured]`
+- **Skeleton results off with segmented basal bodies:** the basal-body columns of `_CQ.txt` stay empty (the rows have
+  fewer cells than the header), and a basal body without cilium gives a row with only its ID. Keep skeleton results
+  on when basal bodies are segmented. `[measured]`
+- **`# excluded:`** also counts the cilia removed by the basal-body filter ("cilia without BBs"), under the name of
+  the border option. `[code]`
+- **Pixel width ≠ height:** CiliaQ notes that it uses the x calibration for both, but keeps the height, so skeleton
+  results differ from the same image with square pixels (lengths of a test image 9.55 instead of 9.12 µm). Make the
+  pixels square (`Image ▸ Properties…`) before the run. `[measured]`
+- **A basal-body channel number beyond the image's channels** (segmented): no error; the basal bodies are taken
+  from the last channel. Check the channel mapping. `[measured]`
+- **32-bit images:** the 3D overviews (`_CQ_RP_3D.png` and the 3D images of single cilia) show no objects, only the
+  IDs and the scale bar. The measurements are not affected. `[measured]`
+- **Time-lapse "Minimum size (A/B)"** above 1 filters the first frame only (time-lapse is not for v0.2.1, §0).
+  `[measured]`
+- **Masks with very many tiny pieces** (very noisy masks) are slow: the time grows with the number of pieces times
+  the foreground voxels. Clean the mask in the Preparator. `[code]`
+- **`_CQ_SKL_info.txt`** names the skeleton image `/<name>_CQ_SKL_Skl.tif`; the file is `<name>_CQ_SKL.tif`. `[code]`
+- **`_CQl.txt`:** with intensity A or B on, an image that lacks that channel gets 0 in its profile columns instead
+  of empty cells (the run notes that the channel does not exist). `[code]`
+- **The multi-file manager:** closing its window leaves CiliaQ waiting (start CiliaQ again); a folder without read
+  access, or `(`, `[`, `+` in a plain-text pattern, stops the pattern search; a file without an extension in the
+  list stops the run. After an image that fails, the progress window lists the next image as done too early
+  (display only). `[code]`

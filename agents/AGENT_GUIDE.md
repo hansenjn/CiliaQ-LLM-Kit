@@ -1,6 +1,6 @@
 # Agent guide — running CiliaQ tools yourself
 
-**Kit version:** 0.0.1 · **Last updated:** November 2026
+**Kit version:** 0.0.2 · **Last updated:** November 2026
 **For:** Claude Code and other agents that can run shell commands on the user's computer.
 **Covers:** CiliaQ Preparator v0.2.0 · CiliaQ v0.2.1 (static images) · CiliaQ Editor v0.0.4 (not runnable)
 
@@ -15,7 +15,8 @@ execute things. All rules of the kit still apply.
    `[release notes]`; CiliaQ v0.2.1 by macro, for static 2D/3D images only `[release notes]`
    `[developer]`. **Never try to run the CiliaQ Editor** — it is interactive only. `[code]`
 2. **Never modify, move or delete the user's original data.** Work on copies (§1).
-3. **Nothing leaves the machine.** Do not upload images, results or metadata anywhere.
+3. **Nothing leaves the machine.** Do not upload, post or send images, results, metadata or anything else, including
+   feedback to the kit authors; you may only draft feedback for the user to send (§8).
 4. **Ask before** installing or updating Fiji, plugins or update sites, and before long batch runs.
 5. **The user judges segmentation quality.** You can compute numbers and make overview images;
    you cannot decide on your own that a mask is correct. Show, explain, and let the user choose.
@@ -84,8 +85,11 @@ Do these once and report the result to the user.
   ```
 
 Frames > 1 means time-lapse: CiliaQ v0.2.1 is not for it. CiliaQ v0.1.7 handles time-lapse but has
-no macro support, so the user must run it in the dialog. `[code]` A unit of "pixel" means the image
-is not calibrated — ask the user for pixel size and z step.
+no macro support, so the user must run it in the dialog (`ciliaq/CILIAQ_v0.1.7.md`). `[code]` A unit of "pixel"
+means the image is not calibrated — ask the user for pixel size and z step, and **never run CiliaQ on an uncalibrated
+image**: skeleton lengths come out 3× too long (`VERSIONS.md` §2 rule 8). `[code]` `[measured]` If the pixel width differs from the height, tell the user
+before running: CiliaQ v0.2.1 gives other skeleton results than with square pixels
+(`ciliaq/CILIAQ_v0.2.1.md` §8). `[measured]`
 
 ---
 
@@ -168,7 +172,7 @@ eval("script", "System.exit(0);");
 
 ## 4. The experiment loop
 
-1. **Ask and look** (Preparator file §4, Steps 1–2). You can compute facts — size, bit depth,
+1. **Ask and look** (`preparator/PREPARATOR_v0.2.0.md` §4, Steps 1–2). You can compute facts — size, bit depth,
    calibration, whether the background contains exact zeros — but what the image *shows* comes from
    the user.
 2. **Propose up to three candidates**, each differing from another in one setting, and say what
@@ -181,8 +185,8 @@ eval("script", "System.exit(0);");
 5. **Summarise the numbers per candidate:** foreground fraction of the segmented channel, number of
    cilia and excluded cilia, cilia without length, median length, branches. Without basal-body
    segmentation, count cilia as result rows in `_CQs.txt`: the header's `of total #:` is always 0
-   then in v0.2.1 (CiliaQ file §4.2). Compare candidates with each other; there is no correct
-   absolute value (Preparator file §6.3).
+   then in v0.2.1 (`ciliaq/CILIAQ_v0.2.1.md` §4.2). Compare candidates with each other; there is no correct
+   absolute value (`preparator/PREPARATOR_v0.2.0.md` §6.3).
 6. **Make images for the user to judge** — e.g. a maximum projection of the raw cilia channel next
    to the segmented channel for each candidate, saved as PNG in the working folder — and tell them
    which files to open. Point out where candidates differ.
@@ -198,8 +202,20 @@ eval("script", "System.exit(0);");
 
 ## 5. Known pitfalls
 
-- **Canny 3D `Custom Value` is not applied in Preparator v0.2.0** (fixed in the next version);
+- **Canny 3D `Custom Value` is not applied in Preparator v0.2.0** (to be fixed in the next version);
   avoid it. `[code]` `[developer]`
+- **Preparator v0.2.0 macro flags:** write them as bare words; `key=true` is read as off. Choice values are
+  case-sensitive; `settings=` ignores the other segmentation keys on the line. `[code]`
+- **Uncalibrated images:** CiliaQ (every version up to v0.2.1; `VERSIONS.md` §2 rule 8) gives 3× too long skeleton lengths and wrong orientation,
+  bending and profiles. Calibrate with the real pixel size and z step first; check `Calibration [pixel/px]` in the `_CQ.txt` header. `[code]` `[measured]`
+- **CiliaQ v0.2.1:** normalised intensity profiles are 0; `minimum-basal-body-size` has no effect (basal bodies below
+  the minimum cilium size are dropped); basal-body z is converted with the pixel width, so basal-body positions and matching can be off in z-stacks,
+  and the basal-body intensity columns of z-stacks are wrong (`ciliaq/CILIAQ_v0.2.1.md` §8). `[code]` `[measured]`
+- **CiliaQ v0.2.1, runs that stop:** with segmented basal bodies, an image without any basal body stops the run
+  (also the rest of the batch); a minimum cilium size of 0 stops it too. Keep the minimum sizes at 1 or more and skeleton
+  results on when basal bodies are segmented (without them the basal-body columns stay empty). `[measured]`
+- **CiliaQ v0.1.7 time-lapse:** "Minimum size (A/B)" above 1 filters only the first frame; leave it at 1 and say
+  so in the report. `[code]`
 - **Version-specific command names:** after an upgrade, update every `run("… vX.Y.Z", …)`.
 - **Repeated runs overwrite outputs** unless the date options are used.
 - **Time-lapse images:** do not run CiliaQ v0.2.1 on them. v0.1.7 handles them but can only be run
@@ -227,3 +243,27 @@ inspection of the images can confirm it.
 
 - CiliaQ v0.2.2 (not yet released). It will be added when it is released.
 - A packaged skill or an MCP server; this guide is the basis for both.
+
+---
+
+## 8. Feedback on the kit
+
+At the end of a longer session, or when the user asks, offer to draft a short feedback report for
+the kit authors. **Never send, post or upload it yourself** (§0 rule 3): save it in the working
+folder (e.g. `ciliaq_work/<date>/KIT_FEEDBACK.md`) and let the user read, edit and send it.
+
+Include:
+- the kit release, your assistant and model, and the Fiji, ImageJ and plugin versions;
+- where the kit was wrong, unclear or incomplete: file and section, what it says, and what actually
+  happened (exact messages and option strings from the run log);
+- what kind of images were analysed (microscope, 2D/3D, pixel size, z step), which settings were
+  tried, which the user chose, and why;
+- anything the user wants to add.
+
+Leave out images, file and folder names, sample names and result values unless the user explicitly
+asks to include them. Mark what you inferred, as opposed to what you observed in a run.
+
+Tell the user where to send it: experiences to the feedback thread in CiliaQ Discussions
+(https://github.com/hansenjn/CiliaQ/discussions/22, public), errors in the kit to
+https://github.com/hansenjn/CiliaQ-LLM-Kit/issues, anything touching unpublished work or otherwise
+confidential can be discussed directly with the kit author by e-mail to jan.hansen [at] scilifelab.se.

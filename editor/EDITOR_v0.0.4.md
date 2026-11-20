@@ -1,6 +1,6 @@
 # CiliaQ Editor v0.0.4
 
-**Kit version:** 0.0.1 · **Last updated:** November 2026
+**Kit version:** 0.0.2 · **Last updated:** November 2026
 **Verified against:** git tag `v0.0.4` of https://github.com/hansenjn/CiliaQ_Editor
 (`CiliaQEdMain.java`, `EditingDialog.java`)
 **Sources:** source code, release notes v0.0.1–v0.0.4, CiliaQ wiki and SOP
@@ -53,7 +53,7 @@ unsegmented copy of the same channel. CiliaQ then analyses the edited image. `[c
 | `Channel Nr of channel that is segmented / semi-binarized / binarized` | 2 | the segmented channel **in `_CQP.tif`** |
 | `Channel Nr of an unmodified/unsegmented copy of the same channel` | 3 | its unsegmented copy **in `_CQP.tif`** |
 | `Add pixels to mask even if intensity is 0.0 in the unsegmented copy of the channel` | off | see below |
-| `Output image name:` | `save as filename + suffix '_ed'` | also `save as filename + suffix 'ed' + date`, `overwrite input file` |
+| `Output image name:` | `save as filename + suffix '_ed'` | also `save as filename + suffix '_ed' + date`, `overwrite input file` |
 
 **Finding the channel numbers.** The defaults (2 and 3) rarely match. The channel list at the end
 of `_CQP.txt` says which output channel is the segmented one and which is the copy. The Preparator
@@ -142,7 +142,7 @@ After editing, look through all slices once more before saving.
 
 ## 5. Output
 
-On `finish analysis & save editings`, next to the input image: `[code]`
+On `finish analysis & save editings`, next to the input image (`<name>` below is the input's name, e.g. `image_CQP`): `[code]`
 
 - `<name>_ed.tif` — the edited image (e.g. `image_CQP_ed.tif`), which goes to CiliaQ;
 - `<name>_ed.txt` — date, image name, the channel numbers, the zero-pixel setting, the number of
@@ -176,4 +176,4 @@ Together these document every manual change. Keep them with the data. `[release 
 - Choosing segmentation settings: `preparator/PREPARATOR_v0.2.0.md`.
 - CiliaQ settings and results: `ciliaq/CILIAQ_v0.2.1.md`.
 - Editor versions other than v0.0.4. For v0.0.3 and earlier: no F3/F4, no zero-pixel option,
-  no automatic display setup. `[release notes]`
+  no binary masks, no channel check, no automatic display setup. `[release notes]`
