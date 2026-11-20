@@ -292,7 +292,7 @@ the BB count corresponds to cells. Fraction of ciliated cells: see the wiki Outp
 - `# excluded:` counts cilia excluded for any reason, including the basal-body `Remove` filter,
   although the header line names only the border option. `[measured]`
 - **Undefined values** (e.g. an average over no voxels, or the 10 % highest voxels of a very small object) are
-  written as a replacement character (`&#xFFFD;`) or `∞`, not left empty. Treat such cells as missing. `[code]`
+  written as a replacement character (&#xFFFD;) or `∞`, not left empty. Treat such cells as missing. `[code]`
 - **`Maximum span` is not computed:** the column after `Sphere radius` has no name and no values. `[code]`
   `[measured]`
 

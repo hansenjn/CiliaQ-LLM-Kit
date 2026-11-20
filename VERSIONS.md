@@ -130,7 +130,7 @@ All entries `[release notes]` unless tagged otherwise.
   image's unit, whatever it is (e.g. nm).
 - Intensity profiles normalised to the reconstruction channel are 0 (rule 9).
 - `Maximum span` is not computed (an empty, unnamed column).
-- Undefined values (e.g. averages over no voxels) are written as a replacement character (`&#xFFFD;`) or `∞`.
+- Undefined values (e.g. averages over no voxels) are written as a replacement character (&#xFFFD;) or `∞`.
 - The recorder can write the CiliaQ line twice.
 - The run stops for an image without any basal body when basal bodies are segmented, and for a minimum size of 0.
   `[measured]`
@@ -144,7 +144,7 @@ All entries `[release notes]` unless tagged otherwise.
 **Known issues in v0.1.7** (details in `ciliaq/CILIAQ_v0.1.7.md` §5): uncalibrated images (rule 8); every cilium
 excluded in 2D with the default exclusion (fixed in v0.2.0); basal-stain radius 3 µm (1 µm since v0.2.0) and in the
 image's unit; normalised profiles 0 (rule 9); `Maximum span` a −1 placeholder (negative averages in time-lapse);
-`&#xFFFD;` / `∞` for undefined values; the time-lapse `_CQ_RP_3D` overview keeps only the first frame; GitHub #5 (3D
+&#xFFFD; / `∞` for undefined values; the time-lapse `_CQ_RP_3D` overview keeps only the first frame; GitHub #5 (3D
 visualization on macOS) open; **in time-lapses, "Minimum size (A/B)" above 1 filters only the first frame**; a
 minimum size of 0 stops the run; non-square pixels, 32-bit 3D overviews, very noisy masks, the multi-file manager
 (as in v0.2.1). `[code]`

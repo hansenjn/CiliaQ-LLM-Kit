@@ -94,7 +94,7 @@ Found in the v0.1.7 source, the release notes of v0.2.0 and v0.2.1, the GitHub i
 | that radius is "3" in the image's unit, not µm | in a nm-calibrated image it is 3 nm | fix planned for v0.2.2 |
 | intensity profiles normalised to the reconstruction channel are never computed (a comparison with NaN is always false) | the normalised profile columns are 0 | every version up to v0.2.1; fix planned for v0.2.2 |
 | **`Maximum span` is not implemented**: a placeholder | every static cilium −1; the time-averaged value in time-lapse is a negative average (e.g. −1.17) | v0.2.0/v0.2.1 leave the static column empty and unnamed; implementation planned for v0.2.2 |
-| undefined values written as a replacement character (`&#xFFFD;`) or `∞` | e.g. "average of 10 % highest voxels" of objects under 5 voxels (0 / 0) | fix planned for v0.2.2 |
+| undefined values written as a replacement character (&#xFFFD;) or `∞` | e.g. "average of 10 % highest voxels" of objects under 5 voxels (0 / 0) | fix planned for v0.2.2 |
 | the time-lapse `_CQ_RP_3D` overview is saved as PNG | only the first frame is kept | fix planned for v0.2.2 |
 | an image that was never saved stops the run with an unclear error | — | explained since v0.2.0 |
 | 3D visualizations on macOS can stop with a `VolatileOffscreenBuffer` error, at random (GitHub #5) | rerun the image | open |
